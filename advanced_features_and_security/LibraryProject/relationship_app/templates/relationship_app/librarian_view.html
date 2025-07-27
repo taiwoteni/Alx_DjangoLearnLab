@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Librarian Dashboard</title>
+</head>
+<body>
+    <h1>Welcome, Librarian</h1>
+    <p>You can manage library operations and book circulation.</p>
+    <nav>
+        <a href="{% url 'list_books' %}">View All Books</a>
+        <a href="{% url 'library_detail' pk=1 %}">Manage Library</a>
+    </nav>
+</body>
+</html>
