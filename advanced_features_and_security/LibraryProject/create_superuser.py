@@ -26,5 +26,10 @@ if not User.objects.filter(username='admin').exists():
         date_of_birth=date(1990, 1, 1)
     )
     print(f"Superuser '{user.username}' created successfully!")
+    print(f"Username: admin")
+    print(f"Password: admin123")
+    print(f"Email: {user.email}")
+    print(f"Date of Birth: {user.date_of_birth}")
+    print(f"Age: {user.age}")
 else:
     print("Superuser 'admin' already exists.")

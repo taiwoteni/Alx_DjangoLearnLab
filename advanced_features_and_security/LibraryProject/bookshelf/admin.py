@@ -1,32 +1,87 @@
 from django.contrib import admin
-from .models import Book
+from django.contrib.auth.admin import UserAdmin
+from django.utils.translation import gettext_lazy as _
+from .models import CustomUser, Book
 
-# Register your models here.
 
-@admin.register(Book)
+class CustomUserAdmin(UserAdmin):
+    """
+    Custom admin interface for CustomUser model.
+    """
+    
+    # Fields to display in the user list view
+    list_display = ('username', 'email', 'first_name', 'last_name', 'date_of_birth', 'is_staff', 'is_active', 'date_joined')
+    
+    # Fields that can be searched
+    search_fields = ('username', 'first_name', 'last_name', 'email')
+    
+    # Fields that can be filtered
+    list_filter = ('is_staff', 'is_superuser', 'is_active', 'date_joined', 'last_login')
+    
+    # Fields to display when editing a user
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        (_('Personal info'), {
+            'fields': ('first_name', 'last_name', 'email', 'date_of_birth', 'profile_photo')
+        }),
+        (_('Permissions'), {
+            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+        }),
+        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+    )
+    
+    # Fields to display when adding a new user
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'email', 'password1', 'password2'),
+        }),
+        (_('Personal info'), {
+            'classes': ('wide',),
+            'fields': ('first_name', 'last_name', 'date_of_birth', 'profile_photo'),
+        }),
+        (_('Permissions'), {
+            'classes': ('wide',),
+            'fields': ('is_active', 'is_staff', 'is_superuser'),
+        }),
+    )
+    
+    # Read-only fields
+    readonly_fields = ('date_joined', 'last_login')
+    
+    # Ordering
+    ordering = ('username',)
+    
+    # Custom methods to display in the admin
+    def get_full_name(self, obj):
+        """Display the user's full name."""
+        return obj.get_full_name() or '-'
+    get_full_name.short_description = _('Full Name')
+    
+    def get_age(self, obj):
+        """Display the user's age."""
+        return obj.age or '-'
+    get_age.short_description = _('Age')
+    
+    # Add custom methods to list display
+    list_display = list_display + ('get_full_name', 'get_age')
+
+
 class BookAdmin(admin.ModelAdmin):
-    # Display these fields in the admin list view
+    """
+    Admin interface for Book model.
+    """
     list_display = ('title', 'author', 'publication_year')
-    
-    # Enable search functionality for title and author fields
-    search_fields = ('title', 'author')
-    
-    # Add filters in the right sidebar
     list_filter = ('publication_year', 'author')
-    
-    # Set the number of books displayed per page
-    list_per_page = 20
-    
-    # Default ordering (most recent books first)
-    ordering = ('-publication_year', 'title')
-    
-    # Fields to display in the edit form
-    fields = ('title', 'author', 'publication_year')
-    
-    # Add help text for better user experience
-    def get_form(self, request, obj=None, **kwargs):
-        form = super().get_form(request, obj, **kwargs)
-        form.base_fields['title'].help_text = 'Enter the full title of the book'
-        form.base_fields['author'].help_text = 'Enter the author\'s full name'
-        form.base_fields['publication_year'].help_text = 'Enter the year the book was published'
-        return form
+    search_fields = ('title', 'author')
+    ordering = ('title',)
+
+
+# Register the models with their respective admin classes
+admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(Book, BookAdmin)
+
+# Customize admin site headers
+admin.site.site_header = _('Library Project Administration')
+admin.site.site_title = _('Library Project Admin')
+admin.site.index_title = _('Welcome to Library Project Administration')
