@@ -1,0 +1,53 @@
+{% extends 'bookshelf/base.html' %}
+
+{% block title %}Example Form - Book Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <h1>Example Form - Security Demo</h1>
+        <p class="text-muted">This form demonstrates security best practices including input validation, sanitization, and CSRF protection.</p>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            {% for field in form %}
+                <div class="mb-3">
+                    <label for="{{ field.id_for_label }}" class="form-label">
+                        {{ field.label }}
+                        {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="text-danger">
+                            {% for error in field.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    {% if field.help_text %}
+                        <div class="form-text">{{ field.help_text }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Submit Form</button>
+                <a href="{% url 'bookshelf:book_list' %}" class="btn btn-secondary">Back to Books</a>
+            </div>
+        </form>
+        
+        <div class="mt-4">
+            <h5>Security Features Demonstrated:</h5>
+            <ul>
+                <li>CSRF token protection</li>
+                <li>Input validation and sanitization</li>
+                <li>XSS prevention</li>
+                <li>SQL injection prevention</li>
+                <li>Length restrictions</li>
+                <li>Pattern matching for safe input</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

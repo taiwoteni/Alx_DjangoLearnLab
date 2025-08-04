@@ -15,4 +15,7 @@ urlpatterns = [
     path('books/cbv/create/', views.BookCreateView.as_view(), name='book_create_cbv'),
     path('books/cbv/<int:pk>/edit/', views.BookUpdateView.as_view(), name='book_edit_cbv'),
     path('books/cbv/<int:pk>/delete/', views.BookDeleteView.as_view(), name='book_delete_cbv'),
+    
+    # Security demonstration
+    path('example-form/', views.example_form_view, name='example_form'),
 ]
