@@ -1,0 +1,55 @@
+{% extends 'bookshelf/base.html' %}
+
+{% block title %}Book List - Book Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Book List</h1>
+    {% if perms.bookshelf.can_create %}
+        <a href="{% url 'bookshelf:book_create' %}" class="btn btn-primary">Add New Book</a>
+    {% endif %}
+</div>
+
+{% if books %}
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Publication Year</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in books %}
+                <tr>
+                    <td>{{ book.title }}</td>
+                    <td>{{ book.author }}</td>
+                    <td>{{ book.publication_year }}</td>
+                    <td>
+                        {% if perms.bookshelf.can_view %}
+                            <a href="#" class="btn btn-sm btn-info">View</a>
+                        {% endif %}
+                        {% if perms.bookshelf.can_edit %}
+                            <a href="{% url 'bookshelf:book_edit' book.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                        {% endif %}
+                        {% if perms.bookshelf.can_delete %}
+                            <a href="{% url 'bookshelf:book_delete' book.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="alert alert-info">
+        <h4>No books found</h4>
+        <p>There are no books in the system yet.</p>
+        {% if perms.bookshelf.can_create %}
+            <a href="{% url 'bookshelf:book_create' %}" class="btn btn-primary">Add the first book</a>
+        {% endif %}
+    </div>
+{% endif %}
+{% endblock %}
