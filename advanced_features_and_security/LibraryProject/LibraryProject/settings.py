@@ -172,3 +172,44 @@ CSP_FORM_ACTION = ("'self'",)
 CSP_FRAME_SRC = ("'none'",)
 CSP_OBJECT_SRC = ("'none'",)
 CSP_MEDIA_SRC = ("'self'",)
+
+# HTTPS Configuration for Production
+# ==================================
+# These settings ensure secure HTTPS connections and protect against various attacks
+
+# SSL/TLS Configuration
+SECURE_SSL_REDIRECT = True  # Redirect all HTTP traffic to HTTPS
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')  # For proxy servers
+
+# HTTP Strict Transport Security (HSTS)
+SECURE_HSTS_SECONDS = 31536000  # 1 year - browsers remember to use HTTPS
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Apply to all subdomains
+SECURE_HSTS_PRELOAD = True  # Allow inclusion in browser preload lists
+
+# Additional Security Headers
+SECURE_CONTENT_TYPE_NOSNIFF = True  # Prevent MIME type sniffing
+SECURE_BROWSER_XSS_FILTER = True  # Enable browser XSS filtering
+X_FRAME_OPTIONS = 'DENY'  # Prevent clickjacking
+
+# Cookie Security - Ensure cookies are only sent over HTTPS
+SESSION_COOKIE_SECURE = True  # Session cookies only over HTTPS
+CSRF_COOKIE_SECURE = True  # CSRF cookies only over HTTPS
+SESSION_COOKIE_HTTPONLY = True  # Prevent XSS access to session cookies
+CSRF_COOKIE_HTTPONLY = True  # Prevent XSS access to CSRF cookies
+SESSION_COOKIE_SAMESITE = 'Strict'  # Strict CSRF protection
+CSRF_COOKIE_SAMESITE = 'Strict'
+
+# Referrer Policy
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
+# Development vs Production Settings
+# ==================================
+# In development, these settings can be adjusted:
+# - SECURE_SSL_REDIRECT = False (for local development)
+# - SESSION_COOKIE_SECURE = False (for local development)
+# - CSRF_COOKIE_SECURE = False (for local development)
+# 
+# For production deployment, ensure:
+# - SSL certificate is properly configured
+# - Domain is added to ALLOWED_HOSTS
+# - DEBUG = False
