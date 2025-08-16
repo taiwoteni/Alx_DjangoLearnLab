@@ -16,6 +16,8 @@ from rest_framework import viewsets, status, filters, generics, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from django_filters import rest_framework
+from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Avg
 from django.db.models import Count
