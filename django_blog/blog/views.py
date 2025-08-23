@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -8,10 +8,15 @@ from django.contrib.auth import update_session_auth_hash
 from django.core.mail import send_mail
 from django.conf import settings
 from django.urls import reverse
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.urls import reverse_lazy
+
 from .forms import (
     CustomUserCreationForm, 
     CustomAuthenticationForm, 
-    UserUpdateForm
+    UserUpdateForm,
+    PostForm
 )
 from .models import Post
 
@@ -156,3 +161,64 @@ def delete_account_view(request):
             messages.error(request, 'Invalid password. Account not deleted.')
     
     return render(request, 'delete_account.html', {'title': 'Delete Account'})
+
+# CRUD Views for Blog Posts
+
+class PostListView(ListView):
+    """List view for all blog posts"""
+    model = Post
+    template_name = 'post_list.html'
+    context_object_name = 'posts'
+    ordering = ['-published_date']
+    paginate_by = 10
+
+class PostDetailView(DetailView):
+    """Detail view for individual blog posts"""
+    model = Post
+    template_name = 'post_detail.html'
+    context_object_name = 'post'
+
+class PostCreateView(LoginRequiredMixin, CreateView):
+    """Create view for new blog posts"""
+    model = Post
+    form_class = PostForm
+    template_name = 'post_create.html'
+    
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        messages.success(self.request, 'Your post has been created successfully!')
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse_lazy('post-detail', kwargs={'pk': self.object.pk})
+
+class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """Update view for editing blog posts"""
+    model = Post
+    form_class = PostForm
+    template_name = 'post_update.html'
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Your post has been updated successfully!')
+        return super().form_valid(form)
+    
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author
+    
+    def get_success_url(self):
+        return reverse_lazy('post-detail', kwargs={'pk': self.object.pk})
+
+class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    """Delete view for removing blog posts"""
+    model = Post
+    template_name = 'post_delete.html'
+    success_url = reverse_lazy('post-list')
+    
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author
+    
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, 'Your post has been deleted successfully!')
+        return super().delete(request, *args, **kwargs)

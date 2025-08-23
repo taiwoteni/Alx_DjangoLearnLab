@@ -20,7 +20,7 @@ BASE_URL = "http://localhost:8000/api"
 HEADERS = {"Content-Type": "application/json"}
 
 # Test data
-TEST_BOOK = {
+TEST_BOOK = {''
     "title": "Test Book for Generic Views",
     "author": 1,  # This should be updated based on existing authors
     "isbn": "1234567890123",
