@@ -1,6 +1,0 @@
-<h1>Post List</h1>
-<ul>
-    {% for post in object_list %}
-        <li>{{ post.title }} - {{ post.content|truncatechars:50 }}</li>
-    {% endfor %}
-</ul>

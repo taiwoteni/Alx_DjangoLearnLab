@@ -1,57 +1,33 @@
-# Django Blog Comment Feature Implementation - COMPLETED
+# Django Blog - Tagging and Search Features
 
-## Step 1: Define the Comment Model
-- [x] Create Comment model in blog/models.py
-- [x] Run migrations to create the model in database
+## Step 1: Integrate Tagging Functionality
+- [ ] Create Tag model with many-to-many relationship to Post
+- [ ] Create and run migrations for the new Tag model
+- [ ] Update Post model to include tags relationship
 
-## Step 2: Create Comment Forms
-- [x] Create CommentForm using Django's ModelForm in blog/forms.py
+## Step 2: Modify Post Creation and Update Forms
+- [ ] Update PostForm to include tags field
+- [ ] Ensure form supports creating new tags
 
-## Step 3: Implement Comment Views
-- [x] Create views to display comments under a blog post
-- [x] Create view to add new comments
-- [x] Create view to edit existing comments
-- [x] Create view to delete comments
-- [x] Ensure proper permissions checking
+## Step 3: Develop Search Functionality
+- [ ] Create search view using Q objects for complex queries
+- [ ] Implement search functionality for title, content, and tags
+- [ ] Add search bar to templates
 
-## Step 4: Set Up Comment Templates
-- [x] Create template for displaying comments list
-- [x] Create template for comment form
-- [x] Create template for editing comments
-- [x] Create template for deleting comments
-- [x] Integrate comments into post_detail template
+## Step 4: Create Templates for Tagging and Search
+- [ ] Update post templates to display tags
+- [ ] Create tag detail page showing all posts with specific tag
+- [ ] Create search results page
 
-## Step 5: Define URL Patterns
-- [x] Configure URL patterns for comment-related actions
-- [x] Add URLs for add, edit, and delete comments
+## Step 5: Configure URL Patterns
+- [ ] Add URL patterns for tag views
+- [ ] Add URL pattern for search functionality
 
-## Step 6: Test Comment Functionality
-- [x] Test adding comments
-- [x] Test editing comments
-- [x] Test deleting comments
-- [x] Verify permissions are correctly enforced
+## Step 6: Test Tagging and Search Features
+- [ ] Test creating posts with tags
+- [ ] Test editing posts with tags
+- [ ] Test search functionality
+- [ ] Test tag filtering
 
-## Step 7: Final Integration
-- [x] Ensure all components work together seamlessly
-- [x] Test the complete comment system
-- [x] Register models in admin.py
-
-## Summary
-The comment feature has been successfully implemented with the following capabilities:
-- Users can view comments on blog posts
-- Authenticated users can add comments
-- Comment authors can edit their own comments
-- Comment authors can delete their own comments
-- Proper permissions are enforced
-- Clean and responsive UI design
-- Integration with existing blog system
-
-## Files Created/Modified:
-- blog/models.py - Added Comment model
-- blog/forms.py - Added CommentForm
-- blog/views.py - Added comment views
-- blog/urls.py - Added comment URLs
-- blog/admin.py - Registered Comment model
-- blog/templates/comment_form.html - Comment creation/editing form
-- blog/templates/comment_confirm_delete.html - Comment deletion confirmation
-- blog/templates/post_detail.html - Updated to display comments
+## Step 7: Documentation
+- [ ] Brief documentation for tagging and search features

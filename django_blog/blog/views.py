@@ -1,19 +1,22 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView
 )
-from django.contrib import messages
-from .models import Post, Comment
-from .forms import PostForm, CommentForm
+from django.urls import reverse_lazy
+from django.db.models import Q
+from .models import Post
+from .forms import PostForm
+
 
 class PostListView(ListView):
     model = Post
-    template_name = 'blog/post_list.html'
+    template_name = 'blog/home.html'
     context_object_name = 'posts'
-    ordering = ['-published_date']
+    ordering = ['-date_posted']
     paginate_by = 5
+
 
 class UserPostListView(ListView):
     model = Post
@@ -23,17 +26,13 @@ class UserPostListView(ListView):
 
     def get_queryset(self):
         user = get_object_or_404(User, username=self.kwargs.get('username'))
-        return Post.objects.filter(author=user).order_by('-published_date')
+        return Post.objects.filter(author=user).order_by('-date_posted')
+
 
 class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/post_detail.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['comments'] = self.object.comments.all()
-        context['comment_form'] = CommentForm()
-        return context
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
@@ -42,8 +41,8 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        messages.success(self.request, 'Your post has been created!')
         return super().form_valid(form)
+
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
@@ -51,68 +50,57 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     template_name = 'blog/post_update.html'
 
     def form_valid(self, form):
-        messages.success(self.request, 'Your post has been updated!')
+        form.instance.author = self.request.user
         return super().form_valid(form)
 
     def test_func(self):
         post = self.get_object()
         return self.request.user == post.author
+
 
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
     template_name = 'blog/post_delete.html'
-    success_url = '/'
-
-    def delete(self, request, *args, **kwargs):
-        messages.success(self.request, 'Your post has been deleted!')
-        return super().delete(request, *args, **kwargs)
+    success_url = reverse_lazy('blog-home')
 
     def test_func(self):
         post = self.get_object()
         return self.request.user == post.author
 
-# Comment Views
-class CommentCreateView(LoginRequiredMixin, CreateView):
-    model = Comment
-    form_class = CommentForm
-    template_name = 'blog/comment_form.html'
 
-    def form_valid(self, form):
-        form.instance.author = self.request.user
-        form.instance.post = get_object_or_404(Post, pk=self.kwargs['post_id'])
-        messages.success(self.request, 'Your comment has been added!')
-        return super().form_valid(form)
+class TagPostListView(ListView):
+    model = Post
+    template_name = 'blog/tag_posts.html'
+    context_object_name = 'posts'
+    paginate_by = 5
 
-    def get_success_url(self):
-        return self.object.post.get_absolute_url()
+    def get_queryset(self):
+        tag_name = self.kwargs.get('tag_name')
+        return Post.objects.filter(tags__name__in=[tag_name]).order_by('-date_posted')
 
-class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    model = Comment
-    form_class = CommentForm
-    template_name = 'blog/comment_form.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tag_name'] = self.kwargs.get('tag_name')
+        return context
 
-    def form_valid(self, form):
-        messages.success(self.request, 'Your comment has been updated!')
-        return super().form_valid(form)
 
-    def get_success_url(self):
-        return self.object.post.get_absolute_url()
+class SearchPostListView(ListView):
+    model = Post
+    template_name = 'blog/search_results.html'
+    context_object_name = 'posts'
+    paginate_by = 5
 
-    def test_func(self):
-        comment = self.get_object()
-        return self.request.user == comment.author
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+        if query:
+            return Post.objects.filter(
+                Q(title__icontains=query) |
+                Q(content__icontains=query) |
+                Q(tags__name__icontains=query)
+            ).distinct().order_by('-date_posted')
+        return Post.objects.none()
 
-class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    model = Comment
-    template_name = 'blog/comment_confirm_delete.html'
-
-    def get_success_url(self):
-        return self.object.post.get_absolute_url()
-
-    def delete(self, request, *args, **kwargs):
-        messages.success(self.request, 'Your comment has been deleted!')
-        return super().delete(request, *args, **kwargs)
-
-    def test_func(self):
-        comment = self.get_object()
-        return self.request.user == comment.author
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = self.request.GET.get('q', '')
+        return context
