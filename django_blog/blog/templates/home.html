@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Django Blog{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-4 fw-bold mb-4">Welcome to Django Blog</h1>
+                <p class="lead mb-4">A modern blogging platform built with Django</p>
+                {% if not user.is_authenticated %}
+                <div class="d-flex gap-3 justify-content-center">
+                    <a href="{% url 'register' %}" class="btn btn-light btn-lg">
+                        <i class="fas fa-user-plus"></i> Get Started
+                    </a>
+                    <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-sign-in-alt"></i> Sign In
+                    </a>
+                </div>
+                {% else %}
+                <div class="d-flex gap-3 justify-content-center">
+                    <a href="{% url 'profile' %}" class="btn btn-light btn-lg">
+                        <i class="fas fa-user"></i> My Profile
+                    </a>
+                    <a href="#" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-plus"></i> Create Post
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Posts Section -->
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h2 class="text-center mb-4">Recent Posts</h2>
+            
+            {% if posts %}
+                <div class="row">
+                    {% for post in posts %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <a href="#" class="text-decoration-none">{{ post.title }}</a>
+                                    </h5>
+                                    <p class="card-text text-muted small">
+                                        <i class="fas fa-user"></i> {{ post.author.username }}
+                                        <i class="fas fa-calendar ms-2"></i> {{ post.published_date|date:"M d, Y" }}
+                                    </p>
+                                    <p class="card-text">{{ post.content|truncatewords:20 }}</p>
+                                    <a href="#" class="btn btn-primary btn-sm">Read More</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center">
+                    <i class="fas fa-blog fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No posts yet</h4>
+                    <p class="text-muted">Be the first to create a post!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
